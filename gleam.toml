@@ -19,7 +19,7 @@ gleam_json = "1.0.1"
 gleam_otp = "~> 0.10"
 gleam_stdlib = "0.43.0"
 lustre = "4.6.3"
-lustre_ui = "~> 0.4"
+lustre_ui = "0.6.0"
 simplifile = "~> 1.5"
 mist = ">= 3.0.0 and < 4.0.0"
 

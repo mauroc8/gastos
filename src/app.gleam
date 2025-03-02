@@ -9,14 +9,13 @@ import gleam/option.{type Option, None, Some}
 import gleam/otp/actor
 import gleam/result
 import lustre
-import lustre/attribute
 import lustre/element.{element}
-import lustre/element/html.{html}
 import lustre/server_component
 import mist.{
   type Connection, type ResponseData, type WebsocketConnection,
   type WebsocketMessage,
 }
+import root_html
 
 pub fn main() {
   let assert Ok(_) =
@@ -32,22 +31,25 @@ pub fn main() {
             handler: socket_update,
           )
 
-        // We need to serve the server component runtime. There's also a minified
-        // version of this script for production.
+        // We need to serve the server component runtime.
         ["lustre-server-component.mjs"] -> {
           let assert Ok(priv) = erlang.priv_directory("lustre")
           let path = priv <> "/static/lustre-server-component.mjs"
+          // There's also a minified version of this script for production.
+          // let path = priv <> "/static/lustre-server-component.min.mjs"
 
-          mist.send_file(path, offset: 0, limit: None)
-          |> result.map(fn(script) {
-            response.new(200)
-            |> response.prepend_header("content-type", "application/javascript")
-            |> response.set_body(script)
-          })
-          |> result.lazy_unwrap(fn() {
-            response.new(404)
-            |> response.set_body(mist.Bytes(bytes_tree.new()))
-          })
+          serve_static_file(path, "application/javascript")
+        }
+
+        // Serve static stylesheet
+        // Note: This file already includes a CSS reset :)
+        ["lustre_ui.css"] -> {
+          let assert Ok(priv) = erlang.priv_directory("lustre_ui")
+
+          // Note: In lustre_ui@1.0.0 this file was renamed to `lustre_ui.css`
+          let path = priv <> "/static/lustre-ui.css"
+
+          serve_static_file(path, "text/css")
         }
 
         // For all other requests we'll just serve some HTML that renders the
@@ -56,30 +58,7 @@ pub fn main() {
           response.new(200)
           |> response.prepend_header("content-type", "text/html")
           |> response.set_body(
-            html([], [
-              html.head([], [
-                html.link([
-                  attribute.rel("stylesheet"),
-                  attribute.href(
-                    "https://cdn.jsdelivr.net/gh/lustre-labs/ui/priv/styles.css",
-                  ),
-                ]),
-                html.script(
-                  [
-                    attribute.type_("module"),
-                    attribute.src("/lustre-server-component.mjs"),
-                  ],
-                  "",
-                ),
-              ]),
-              html.body([], [
-                element(
-                  "lustre-server-component",
-                  [server_component.route("/counter")],
-                  [html.p([], [html.text("This is a slot")])],
-                ),
-              ]),
-            ])
+            root_html.root_html()
             |> element.to_document_string_builder
             |> bytes_tree.from_string_tree
             |> mist.Bytes,
@@ -93,7 +72,20 @@ pub fn main() {
   process.sleep_forever()
 }
 
-//
+fn serve_static_file(path, mime_type) {
+  mist.send_file(path, offset: 0, limit: None)
+  |> result.map(fn(contents) {
+    response.new(200)
+    |> response.prepend_header("content-type", mime_type)
+    |> response.set_body(contents)
+  })
+  |> result.lazy_unwrap(fn() {
+    response.new(404)
+    |> response.set_body(mist.Bytes(bytes_tree.new()))
+  })
+}
+
+// --- COUNTER COMPONENT
 
 type Counter =
   Subject(lustre.Action(counter.Msg, lustre.ServerComponent))
