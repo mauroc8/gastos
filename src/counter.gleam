@@ -1,10 +1,18 @@
 import gleam/int
 import lustre
 import lustre/attribute
-import lustre/element.{type Element}
+import lustre/element.{type Element, element}
 import lustre/element/html
 import lustre/event
-import lustre/ui
+import lustre/server_component
+
+pub fn component(children) {
+  element(
+    "lustre-server-component",
+    [server_component.route("/counter")],
+    children,
+  )
+}
 
 // MAIN ------------------------------------------------------------------------
 
@@ -44,15 +52,14 @@ fn view(model: Model) -> Element(Msg) {
   let styles = [#("width", "100vw"), #("height", "100vh"), #("padding", "1rem")]
   let count = int.to_string(model)
 
-  ui.centre(
-    [attribute.style(styles)],
-    ui.stack([], [
-      ui.button([event.on_click(Incr)], [element.text("+")]),
+  html.div([attribute.style(styles)], [
+    html.div([], [
+      html.button([event.on_click(Incr)], [element.text("+")]),
       html.slot([]),
       html.p([attribute.style([#("text-align", "center")])], [
         element.text(count),
       ]),
-      ui.button([event.on_click(Decr)], [element.text("-")]),
+      html.button([event.on_click(Decr)], [element.text("-")]),
     ]),
-  )
+  ])
 }
