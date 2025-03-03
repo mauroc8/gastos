@@ -1,4 +1,8 @@
+import gleam/dynamic
+import gleam/dynamic/decode
 import gleam/int
+import gleam/list
+import gleam/result
 import lib/flexbox
 import lustre/attribute
 import lustre/element/html
@@ -47,4 +51,28 @@ pub fn max_width_wrapper(px, attributes, children) {
     ],
     children,
   )
+}
+
+/// Lustre uses `dynamic.DecodeError` that appears to be deprecated. This function makes the conversion
+/// from `decode.DecodeError`
+pub fn lustre_decoder_result(
+  res: Result(a, List(decode.DecodeError)),
+) -> Result(a, List(dynamic.DecodeError)) {
+  res
+  |> result.map_error(fn(decode_errors) {
+    decode_errors
+    |> list.map(fn(decode_error) {
+      case decode_error {
+        decode.DecodeError(a, b, c) -> dynamic.DecodeError(a, b, c)
+      }
+    })
+  })
+}
+
+/// See https://github.com/lustre-labs/lustre/issues/224
+pub fn disabled_attribute(value) {
+  case value {
+    True -> attribute.attribute("disabled", "true")
+    False -> attribute.none()
+  }
 }

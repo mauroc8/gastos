@@ -2,6 +2,7 @@ import gleam/bytes_tree
 import gleam/erlang/process.{type Selector, type Subject}
 import gleam/http/request.{type Request, Request}
 import gleam/http/response
+import gleam/io
 import gleam/json
 import gleam/option.{type Option, None, Some}
 import gleam/otp/actor
@@ -113,11 +114,18 @@ fn socket_update(
 
     mist.Binary(_) -> actor.continue(component)
     mist.Custom(patch) -> {
-      let assert Ok(_) =
+      case
         patch
         |> server_component.encode_patch
         |> json.to_string
         |> mist.send_text_frame(conn, _)
+      {
+        Ok(_) -> Nil
+        Error(err) -> {
+          io.debug(err)
+          Nil
+        }
+      }
 
       actor.continue(component)
     }

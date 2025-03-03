@@ -1,4 +1,3 @@
-import gleam/int
 import lib/css
 import lustre/attribute
 import lustre/element/html
@@ -9,7 +8,7 @@ pub fn static_styles() {
     "
 .row {
   display: flex;
-  /* I don't like the default `align-items: stretch` because it violates component encapsulation principles */
+  /* I discourage the use of `align-items: stretch` because it violates component encapsulation principles. */
   align-items: flex-start;
 }
 
@@ -43,6 +42,9 @@ pub fn static_styles() {
 .column > .fill-height { flex-grow: 1; }
 :not(.column) > .fill-height { height: 100% }
 
+.stretch-children {
+  align-items: stretch;
+}
     ",
   )
 }
@@ -109,4 +111,15 @@ pub fn fill_width() {
 /// Fills the available vertical space (either with `flex-grow: 1` or with `height: 100%`)
 pub fn fill_height() {
   attribute.class("fill-height")
+}
+
+/// In columns, this is equivalent to using `fill_width` in every single direct child of this element.
+/// In rows, this is equivalent to using `fill_height` in every single direct child of this element.
+/// 
+/// It is often convenient, since repeating `fill_width` everywhere gets tiresome.
+/// 
+/// Use carefully. This attribute could be used to violate compolent encapsulation principles, because a
+/// component could take ownership on deciding how to render its children (possibly other components).
+pub fn stretch_children() {
+  attribute.class("stretch-children")
 }
