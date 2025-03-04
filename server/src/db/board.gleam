@@ -28,19 +28,20 @@ fn row_decoder() -> Decoder(Board) {
   }
 }
 
-pub fn create_board(connection, title: String) {
+pub fn create_board(connection, title: String) -> Result(Uuid, CreateBoardError) {
   case string.length(title) > 50 {
     True -> Error(InvalidTitle)
     False -> {
+      let id = uuid.v1()
       case
         shork.query(
           "INSERT INTO `gastos`.`board` (`id`, `title`) VALUES (?, ?)",
         )
-        |> shork.parameter(shork.text(uuid.v1() |> uuid.to_string))
+        |> shork.parameter(shork.text(id |> uuid.to_string))
         |> shork.parameter(shork.text(title))
         |> shork.execute(connection)
       {
-        Ok(_) -> Ok(Nil)
+        Ok(_) -> Ok(id)
         Error(query_error) -> Error(CreateBoardQueryError(query_error))
       }
     }

@@ -13,12 +13,11 @@ version = "1.0.0"
 # https://gleam.run/writing-gleam/gleam-toml/.
 
 [dependencies]
-gleam_erlang = "~> 0.24"
-gleam_http = "~> 3.6"
+gleam_erlang = "~> 0.34"
+gleam_http = ">= 4.0.0 and < 5.0.0"
 gleam_json = ">= 2.0.0 and < 3.0.0"
-gleam_otp = "~> 0.10"
+gleam_otp = "~> 0.16.1"
 gleam_stdlib = "0.55.0"
-lustre = "4.6.3"
 mist = ">= 4.0.0 and < 5.0.0"
 shork = ">= 1.0.0 and < 2.0.0"
 youid = ">= 1.2.0 and < 2.0.0"

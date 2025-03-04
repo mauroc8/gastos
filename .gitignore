@@ -1,1 +1,9 @@
-build
+client/build
+client/priv/static
+server/build
+
+# I'm using a copy of the lustre src in src/lustre because I fixed a bug in my local version
+server/src/lustre
+server/src/lustre*
+server/src/server-component.mjs
+server/src/vdom.ffi.mjs

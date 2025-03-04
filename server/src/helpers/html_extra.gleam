@@ -33,10 +33,7 @@ pub fn document(title, body) {
       flexbox.static_styles(),
       script,
     ]),
-    html.body(
-      [attribute.style([#("width", "100%"), #("height", "100%")])],
-      body,
-    ),
+    html.body([], body),
   ])
 }
 
@@ -70,7 +67,7 @@ pub fn lustre_decoder_result(
 }
 
 /// See https://github.com/lustre-labs/lustre/issues/224
-pub fn disabled_attribute(value) {
+pub fn server_side_disabled(value) {
   case value {
     True -> attribute.attribute("disabled", "true")
     False -> attribute.none()
