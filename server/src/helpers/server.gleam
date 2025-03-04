@@ -122,6 +122,7 @@ fn socket_update(
       {
         Ok(_) -> Nil
         Error(err) -> {
+          io.print("Error en socket_update: ")
           io.debug(err)
           Nil
         }

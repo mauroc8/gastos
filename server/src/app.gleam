@@ -31,6 +31,9 @@ pub fn main() {
         ["home"] ->
           server.define_server_component(req, home_page.app, connection)
 
+        ["board"] ->
+          server.define_server_component(req, board_page.app, connection)
+
         // We need to serve the server component runtime.
         ["lustre-server-component.mjs"] -> {
           // If lustre@v4 is installed as a gleam package the correct way to do this is:
@@ -52,11 +55,7 @@ pub fn main() {
 
         [""] -> server.serve_html(home_page.page())
 
-        [id] ->
-          case uuid.from_string(id) {
-            Ok(id) -> server.serve_html(board_page.document(connection, id))
-            Error(_) -> server.serve_html(home_page.page())
-          }
+        [id] -> server.serve_html(board_page.document(id))
 
         _ -> {
           server.serve_html(home_page.page())
