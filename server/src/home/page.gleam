@@ -1,9 +1,8 @@
 import client_components/redirect
-import db/board
+import dashboard/table as dashboard_table
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/option.{type Option, None, Some}
-import gleam/string
 import helpers/html_extra
 import lib/css
 import lib/flexbox
@@ -61,7 +60,9 @@ fn init(connection) {
 pub opaque type Msg {
   BluredDashboardName(value: String)
   Submitted
-  CreateBoardResponse(Result(uuid.Uuid, board.CreateBoardError))
+  CreateDashboardResponse(
+    Result(uuid.Uuid, dashboard_table.CreateDashboardError),
+  )
 }
 
 fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
@@ -84,17 +85,25 @@ fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
             State(..state, is_submitting: True),
             effect.from(fn(dispatch) {
               dispatch(
-                CreateBoardResponse(board.create_board(state.connection, name)),
+                CreateDashboardResponse(dashboard_table.create(
+                  state.connection,
+                  name,
+                )),
               )
             }),
           )
         }
       }
     }
-    CreateBoardResponse(res) ->
+    CreateDashboardResponse(res) ->
       case res {
         Ok(id) -> #(
           State(..state, redirect_to: Some("/" <> { id |> uuid.to_string })),
+          effect.none(),
+        )
+
+        Error(dashboard_table.InvalidTitle) -> #(
+          State(..state, dashboard_name_error: Some("El título no es válido")),
           effect.none(),
         )
 

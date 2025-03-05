@@ -1,14 +1,13 @@
-import board_page
 import counter
-import db/migrations
+import dashboard/page as dashboard_page
 import gleam/erlang/process
 import gleam/http/request.{type Request, Request}
 import gleam/http/response.{type Response}
 import helpers/server
-import home_page
+import home/page as home_page
+import migrations
 import mist.{type Connection, type ResponseData}
 import shork
-import youid/uuid
 
 pub fn main() {
   // Start database connection
@@ -31,8 +30,8 @@ pub fn main() {
         ["home"] ->
           server.define_server_component(req, home_page.app, connection)
 
-        ["board"] ->
-          server.define_server_component(req, board_page.app, connection)
+        ["dashboard"] ->
+          server.define_server_component(req, dashboard_page.app, connection)
 
         // We need to serve the server component runtime.
         ["lustre-server-component.mjs"] -> {
@@ -47,19 +46,20 @@ pub fn main() {
 
         ["styles.css"] -> server.serve_static_file("src/styles.css", "text/css")
 
+        // Serves the client/ build, that includes client components declarations
         ["index.mjs"] ->
           server.serve_static_file(
             "../client/priv/static/app.mjs",
             "application/javascript",
           )
 
-        [""] -> server.serve_html(home_page.page())
+        // Home Page
+        [] -> server.serve_html(home_page.page())
 
-        [id] -> server.serve_html(board_page.document(id))
+        // Dashboard Page
+        [id] -> server.serve_html(dashboard_page.document(id))
 
-        _ -> {
-          server.serve_html(home_page.page())
-        }
+        _ -> server.redirect("")
       }
     }
     |> mist.new
