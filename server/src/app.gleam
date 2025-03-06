@@ -46,7 +46,7 @@ pub fn main() {
 
         ["styles.css"] -> server.serve_static_file("src/styles.css", "text/css")
 
-        // Serves the client/ build, that includes client components declarations
+        // Serves the client/ build, which includes client components declarations
         ["index.mjs"] ->
           server.serve_static_file(
             "../client/priv/static/app.mjs",
