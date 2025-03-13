@@ -1,5 +1,5 @@
 import client_components/redirect
-import dashboard/table as dashboard_table
+import dashboard
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/option.{type Option, None, Some}
@@ -34,8 +34,10 @@ pub fn app() {
 
 pub opaque type State {
   State(
-    dashboard_name: String,
-    dashboard_name_error: Option(String),
+    dashboard_title: String,
+    first_person_name: String,
+    second_person_name: String,
+    dashboard_title_error: Option(String),
     is_submitting: Bool,
     connection: shork.Connection,
     redirect_to: Option(String),
@@ -45,8 +47,10 @@ pub opaque type State {
 fn init(connection) {
   #(
     State(
-      dashboard_name: "",
-      dashboard_name_error: None,
+      dashboard_title: "",
+      first_person_name: "",
+      second_person_name: "",
+      dashboard_title_error: None,
       is_submitting: False,
       connection:,
       redirect_to: None,
@@ -60,34 +64,40 @@ fn init(connection) {
 pub opaque type Msg {
   BluredDashboardName(value: String)
   Submitted
-  CreateDashboardResponse(
-    Result(uuid.Uuid, dashboard_table.CreateDashboardError),
-  )
+  CreateDashboardResponse(Result(uuid.Uuid, dashboard.CreateDashboardError))
 }
 
 fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
   case msg {
     BluredDashboardName(value) -> {
       #(
-        State(..state, dashboard_name: value, dashboard_name_error: None),
+        State(..state, dashboard_title: value, dashboard_title_error: None),
         effect.none(),
       )
     }
     Submitted -> {
-      case state.dashboard_name {
-        "" -> #(
-          State(..state, dashboard_name_error: Some("Campo requerido")),
+      case
+        state.dashboard_title,
+        state.first_person_name,
+        state.second_person_name
+      {
+        a, b, c if a == "" || b == "" || c == "" -> #(
+          State(..state, dashboard_title_error: Some("Campo requerido")),
           effect.none(),
         )
 
-        name -> {
+        title, first_person_name, second_person_name -> {
           #(
             State(..state, is_submitting: True),
             effect.from(fn(dispatch) {
               dispatch(
-                CreateDashboardResponse(dashboard_table.create(
+                CreateDashboardResponse(dashboard.create(
                   state.connection,
-                  name,
+                  dashboard.CreateDashboardParams(
+                    title:,
+                    first_person_name:,
+                    second_person_name:,
+                  ),
                 )),
               )
             }),
@@ -102,13 +112,13 @@ fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
           effect.none(),
         )
 
-        Error(dashboard_table.InvalidTitle) -> #(
-          State(..state, dashboard_name_error: Some("El título no es válido")),
+        Error(dashboard.InvalidTitle) -> #(
+          State(..state, dashboard_title_error: Some("El título no es válido")),
           effect.none(),
         )
 
         Error(_) -> #(
-          State(..state, dashboard_name_error: Some("Hubo un error")),
+          State(..state, dashboard_title_error: Some("Hubo un error")),
           effect.none(),
         )
       }
@@ -118,11 +128,11 @@ fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
 // ---
 
 fn view(state: State) {
-  let State(dashboard_name_error:, is_submitting:, redirect_to:, ..) = state
+  let State(dashboard_title_error:, is_submitting:, redirect_to:, ..) = state
 
   let error_message_id = "dasboard-name-input-error"
 
-  let error_message_attrs = case dashboard_name_error {
+  let error_message_attrs = case dashboard_title_error {
     Some(_) -> [
       attribute.attribute("aria-invalid", "true"),
       attribute.attribute("aria-describedby", error_message_id),
@@ -141,7 +151,7 @@ fn view(state: State) {
       ..error_message_attrs
     ])
 
-  let error_message = case dashboard_name_error {
+  let error_message = case dashboard_title_error {
     Some(error_message) ->
       html.div(
         [

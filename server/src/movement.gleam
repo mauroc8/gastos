@@ -1,5 +1,6 @@
-import dashboard/table.{type Dashboard}
+import dashboard.{type Dashboard}
 import lib/id.{type Id}
+import shork
 
 pub fn migrations() {
   "
@@ -51,7 +52,19 @@ pub fn create(
   date: #(Int, Int, Int),
   installments: Int,
 ) {
-  todo
+  shork.query(
+    "
+    INSERT INTO gastos.movement (
+      dashboard_id,
+      person,
+      kind,
+      amount,
+      concept,
+      date,
+      installments
+    )
+  ",
+  )
 }
 
 pub fn fetch_by_date(
@@ -72,7 +85,7 @@ pub fn fetch_by_date(
 /// 
 /// This function only returns the movements that have pending installments in the next month(s).
 /// Movements without installments, or whose installments were all in the present/past month, are discarded.
-pub fn fetch_with_due_installments(dashboard_id: Id(Dashboard)) {
+pub fn fetch_with_future_installments(dashboard_id: Id(Dashboard)) {
   todo
 }
 

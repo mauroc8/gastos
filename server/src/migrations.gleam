@@ -1,9 +1,9 @@
-import dashboard/table as dashboard_table
-import movement/table as movement_table
+import dashboard
+import movement
 import shork
 
 pub fn run(connection) {
-  let query = dashboard_table.migrations() <> movement_table.migrations()
+  let query = dashboard.migrations() <> movement.migrations()
 
   let assert Ok(_) =
     shork.query(query)

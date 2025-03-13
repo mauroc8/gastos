@@ -1,10 +1,10 @@
 import counter
-import dashboard/page as dashboard_page
+import dashboard
 import gleam/erlang/process
 import gleam/http/request.{type Request, Request}
 import gleam/http/response.{type Response}
 import helpers/server
-import home/page as home_page
+import home
 import migrations
 import mist.{type Connection, type ResponseData}
 import shork
@@ -27,11 +27,10 @@ pub fn main() {
         // DOM updates to the browser and receive events from the client.
         ["counter"] -> server.define_server_component(req, counter.app, 0)
 
-        ["home"] ->
-          server.define_server_component(req, home_page.app, connection)
+        ["home"] -> server.define_server_component(req, home.app, connection)
 
         ["dashboard"] ->
-          server.define_server_component(req, dashboard_page.app, connection)
+          server.define_server_component(req, dashboard.app, connection)
 
         // We need to serve the server component runtime.
         ["lustre-server-component.mjs"] -> {
@@ -53,11 +52,9 @@ pub fn main() {
             "application/javascript",
           )
 
-        // Home Page
-        [] -> server.serve_html(home_page.page())
+        [] -> server.serve_html(home.page())
 
-        // Dashboard Page
-        [id] -> server.serve_html(dashboard_page.document(id))
+        [id] -> server.serve_html(dashboard.page(id))
 
         _ -> server.redirect("")
       }
