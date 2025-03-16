@@ -67,6 +67,8 @@ pub fn lustre_decoder_result(
 }
 
 /// See https://github.com/lustre-labs/lustre/issues/224
+/// Note: This may not work to switch from enabled to disabled, but
+/// it works the other way around.
 pub fn server_side_disabled(value) {
   case value {
     True -> attribute.attribute("disabled", "true")

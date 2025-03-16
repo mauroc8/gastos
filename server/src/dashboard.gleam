@@ -8,13 +8,14 @@ import gleam/option.{type Option, None, Some}
 import gleam/string
 import helpers/html_extra
 import lib/flexbox
-import lib/id.{type Id}
+import lib/id.{type DashboardT, type Id}
 import lustre
 import lustre/attribute
 import lustre/effect
 import lustre/element
 import lustre/element/html
 import lustre/server_component
+import movement
 import shork
 import youid/uuid.{type Uuid}
 
@@ -23,7 +24,7 @@ import youid/uuid.{type Uuid}
 pub fn migrations() {
   "
 CREATE TABLE IF NOT EXISTS gastos.dashboard (
-  id INT NOT NULL AUTO_INCREMENT,
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   uuid VARCHAR(36) NOT NULL,
   title VARCHAR(50) NOT NULL,
   first_person_name VARCHAR(40) NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE IF NOT EXISTS gastos.dashboard (
 
 pub type Dashboard {
   Dashboard(
-    id: Id(Dashboard),
+    id: Id(DashboardT),
     title: String,
     first_person_name: String,
     second_person_name: String,
@@ -99,7 +100,7 @@ pub fn get_by_uuid(
     )
     |> shork.parameter(shork.text(uuid.to_string(dashboard_uuid)))
     |> shork.returning({
-      use id <- decode.field(0, id.decode_id())
+      use id <- decode.field(0, id.decode())
       use title <- decode.field(1, decode.string)
       use first_person_name <- decode.field(2, decode.string)
       use second_person_name <- decode.field(2, decode.string)
@@ -213,7 +214,7 @@ fn update(state: State, msg: Msg) -> #(State, effect.Effect(Msg)) {
 // ---
 
 fn view(state) {
-  let State(redirect_to:, dashboard:, ..) = state
+  let State(redirect_to:, dashboard:, connection:) = state
 
   // Redirects client-side through a custom element
   let redirect_component = case redirect_to {
@@ -239,12 +240,41 @@ fn view(state) {
     [
       title_component,
       redirect_component,
-      html.text(case dashboard {
-        None -> "Cargando…"
-        Some(Ok(dashboard_data)) -> dashboard_data.title
-        Some(Error(DashboardNotFound)) -> "El tablero solicitado no existe"
-        Some(Error(_)) -> "Error desconocido"
-      }),
+      case dashboard {
+        None -> html.text("Cargando…")
+        Some(Ok(dashboard)) ->
+          html.div([], [
+            html.text(dashboard.title),
+            view_movements(connection, dashboard.id),
+          ])
+        Some(Error(DashboardNotFound)) ->
+          html.text("El tablero solicitado no existe")
+        Some(Error(_)) -> html.text("Error desconocido")
+      },
     ],
   )
+}
+
+// --- view_movements
+
+pub type CreateForm {
+  CreateForm(
+    person: movement.Person,
+    kind: movement.Kind,
+    amount: Option(Int),
+    concept: String,
+    date: String,
+    installments: String,
+  )
+}
+
+pub fn view_movements(
+  connection: shork.Connection,
+  dashboard_id: Id(DashboardT),
+) {
+  let movements = movement.fetch(connection, dashboard_id)
+
+  html.div([flexbox.column(), flexbox.fill_width()], [
+    // TODO:
+  ])
 }
