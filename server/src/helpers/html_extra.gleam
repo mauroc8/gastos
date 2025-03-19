@@ -3,7 +3,7 @@ import gleam/dynamic/decode
 import gleam/int
 import gleam/list
 import gleam/result
-import lib/flexbox
+import lib/layout
 import lustre/attribute
 import lustre/element/html
 
@@ -30,7 +30,7 @@ pub fn document(title, body) {
       title,
       lustre_ui_runtime,
       static_stylesheet,
-      flexbox.static_styles(),
+      layout.static_styles(),
       script,
     ]),
     html.body([], body),

@@ -6,7 +6,7 @@ import gleam/int
 import gleam/option.{type Option, None, Some}
 import helpers/html_extra
 import lib/css
-import lib/flexbox
+import lib/layout
 import lustre
 import lustre/attribute
 import lustre/effect
@@ -134,7 +134,7 @@ fn view(state: State) {
 
   let input = fn(max, blur_msg) {
     html.input([
-      flexbox.fill_width(),
+      layout.fill_width(),
       attribute.autocomplete("one-time-code"),
       attribute.max(int.to_string(max)),
       server_component.include(["target.value"]),
@@ -166,7 +166,7 @@ fn view(state: State) {
   }
 
   let field = fn(label, input) {
-    html.label([flexbox.column(), flexbox.spacing(8)], [html.text(label), input])
+    html.label([layout.column(), layout.spacing(8)], [html.text(label), input])
   }
 
   html_extra.document("Crear tablero | Gastos", [
@@ -174,10 +174,10 @@ fn view(state: State) {
       [
         attribute.style([#("max-width", "700px"), #("margin", "0 auto")]),
         css.padding(16),
-        flexbox.column(),
-        flexbox.fill_height(),
-        flexbox.center_y(),
-        flexbox.spacing(16),
+        layout.column(),
+        layout.fill_height(),
+        layout.center_y(),
+        layout.spacing(16),
       ],
       [
         html.legend([css.semibold()], [html.text("Crear un tablero nuevo")]),

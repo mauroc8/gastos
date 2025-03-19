@@ -7,7 +7,7 @@ import gleam/io
 import gleam/option.{type Option, None, Some}
 import gleam/string
 import helpers/html_extra
-import lib/flexbox
+import lib/layout
 import lib/id.{type DashboardT, type Id}
 import lustre
 import lustre/attribute
@@ -232,9 +232,9 @@ fn view(state) {
 
   html.main(
     [
-      flexbox.column(),
-      flexbox.center_x(),
-      flexbox.center_y(),
+      layout.column(),
+      layout.center_x(),
+      layout.center_y(),
       attribute.style([#("max-width", "700px"), #("margin", "0 auto")]),
     ],
     [
@@ -274,7 +274,7 @@ pub fn view_movements(
 ) {
   let movements = movement.fetch(connection, dashboard_id)
 
-  html.div([flexbox.column(), flexbox.fill_width()], [
+  html.div([layout.column(), layout.fill_width()], [
     // TODO:
   ])
 }

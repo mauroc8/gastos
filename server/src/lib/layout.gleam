@@ -143,14 +143,14 @@ pub fn stretch_y() {
 
 /// Ensures a fixed width in px.
 /// 
-/// Sometimes elements in flexbox don't respect their `width` CSS property. Use this
-/// function to ensure a specific width.
-/// 
-/// In the following example, `width()` will also apply `flex-shrink: 0` to the element:
+/// Elements in flexbox layout don't always respect their `width` CSS property. They are
+/// free to shrink if needed. Use this function to force a specific width.
+///
+/// In the following example, the use of `width()` also applies `flex-shrink: 0` to the element:
 /// 
 /// ```
 /// html.div(
-///   [flexbox.row(), flexbox.center_y(), flexbox.spacing(8)],
+///   [layout.row(), layout.center_y(), layout.spacing(8)],
 ///   [
 ///     html.div([..width(24), ..height(24)], [contacts_icon]),
 ///     html.span([], [html.text("Contacts")])
@@ -165,6 +165,8 @@ pub fn width(px) {
 }
 
 /// Ensures a fixed height in px.
+/// 
+/// See comment in `width`.
 pub fn height(px) {
   [
     attribute.class("fixed-height"),
