@@ -18,17 +18,17 @@ pub fn static_styles() {
   align-items: flex-start;
 }
 
-.column.align-left { justify-content: flex-start; }
-.row.align-left { align-items: flex-start; }
+.column.align-top { justify-content: flex-start; }
+.row.align-top { align-items: flex-start; }
 
-.column.align-right { justify-content: flex-end; }
-.row.align-right { align-items: flex-end; }
+.column.align-bottom { justify-content: flex-end; }
+.row.align-bottom { align-items: flex-end; }
 
-.column.align-top { align-items: flex-start; }
-.row.align-top { justify-content: flex-start; }
+.column.align-left { align-items: flex-start; }
+.row.align-left { justify-content: flex-start; }
 
-.column.align-bottom { align-items: flex-end; }
-.row.align-bottom { justify-content: flex-end; }
+.column.align-right { align-items: flex-end; }
+.row.align-right { justify-content: flex-end; }
 
 .column.center-x { align-items: center; }
 .row.center-x { justify-content: center; }

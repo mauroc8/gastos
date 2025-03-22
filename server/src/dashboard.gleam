@@ -7,8 +7,8 @@ import gleam/io
 import gleam/option.{type Option, None, Some}
 import gleam/string
 import helpers/html_extra
-import lib/layout
 import lib/id.{type DashboardT, type Id}
+import lib/layout
 import lustre
 import lustre/attribute
 import lustre/effect
@@ -103,7 +103,7 @@ pub fn get_by_uuid(
       use id <- decode.field(0, id.decode())
       use title <- decode.field(1, decode.string)
       use first_person_name <- decode.field(2, decode.string)
-      use second_person_name <- decode.field(2, decode.string)
+      use second_person_name <- decode.field(3, decode.string)
 
       decode.success(Dashboard(
         id:,
@@ -245,6 +245,7 @@ fn view(state) {
         Some(Ok(dashboard)) ->
           html.div([], [
             html.text(dashboard.title),
+            create_movement_form(dashboard),
             view_movements(connection, dashboard.id),
           ])
         Some(Error(DashboardNotFound)) ->
@@ -253,6 +254,65 @@ fn view(state) {
       },
     ],
   )
+}
+
+// --- create_movement_form
+
+fn create_movement_form(dashboard: Dashboard) {
+  let Dashboard(first_person_name:, second_person_name:, ..) = dashboard
+
+  html.fieldset([layout.column(), layout.fill_width(), layout.spacing(16)], [
+    html.legend([], [html.text("Crear movimiento")]),
+    html.div([layout.row(), layout.center_y(), layout.spacing(12)], [
+      html.label([layout.column(), layout.spacing(8)], [
+        html.div([html_extra.visually_hidden()], [html.text("Persona")]),
+        html.select([], [
+          html.option([attribute.value("0")], first_person_name),
+          html.option([attribute.value("1")], second_person_name),
+        ]),
+      ]),
+      html.label([layout.column(), layout.spacing(8)], [
+        html.div([html_extra.visually_hidden()], [
+          html.text("Tipo de movimiento"),
+        ]),
+        html.select([], [
+          html.option([attribute.value("0")], "gastó"),
+          html.option([attribute.value("1")], "tomó prestado"),
+        ]),
+      ]),
+      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
+        html.div([html_extra.visually_hidden()], [html.text("Monto")]),
+        html.div([], [html.text("$")]),
+        html.input([
+          attribute.type_("number"),
+          attribute.min("0"),
+          attribute.required(True),
+        ]),
+      ]),
+    ]),
+    html.label([layout.row(), layout.spacing(8), layout.center_y()], [
+      html.div([], [html.text("En concepto de")]),
+      html.input([]),
+    ]),
+    html.div([layout.row(), layout.center_y(), layout.spacing(12)], [
+      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
+        html.div([], [html.text("El día")]),
+        html.input([attribute.placeholder("de hoy")]),
+      ]),
+      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
+        html.div([], [html.text("pagado en")]),
+        html.input([
+          attribute.type_("number"),
+          attribute.min("1"),
+          attribute.placeholder("1"),
+        ]),
+        html.span([], [html.text("cuota(s)")]),
+      ]),
+    ]),
+    html.div([layout.fill_width(), layout.row(), layout.align_right()], [
+      html.button([], [html.text("Crear")]),
+    ]),
+  ])
 }
 
 // --- view_movements
@@ -268,10 +328,7 @@ pub type CreateForm {
   )
 }
 
-pub fn view_movements(
-  connection: shork.Connection,
-  dashboard_id: Id(DashboardT),
-) {
+fn view_movements(connection: shork.Connection, dashboard_id: Id(DashboardT)) {
   let movements = movement.fetch(connection, dashboard_id)
 
   html.div([layout.column(), layout.fill_width()], [

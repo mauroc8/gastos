@@ -75,3 +75,7 @@ pub fn server_side_disabled(value) {
     False -> attribute.none()
   }
 }
+
+pub fn visually_hidden() {
+  attribute.class("visually-hidden")
+}

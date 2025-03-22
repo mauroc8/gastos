@@ -18,7 +18,7 @@ pub fn main() {
     |> shork.database("gastos")
     |> shork.connect
 
-  let _ = migrations.run(connection)
+  let assert Ok(_) = migrations.run(connection)
 
   let assert Ok(_) =
     fn(req: Request(Connection)) -> Response(ResponseData) {

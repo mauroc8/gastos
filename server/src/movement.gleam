@@ -13,8 +13,8 @@ pub fn migrations() {
   "
 create table if not exists gastos.movement (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  person TINYINT(1) UNSIGNED NOT NULL,
-  kind TINYINT(1) UNSIGNED NOT NULL,
+  person BOOLEAN NOT NULL,
+  kind BOOLEAN NOT NULL,
   amount INT UNSIGNED NOT NULL,
   concept VARCHAR(100) NOT NULL,
   date DATE NOT NULL,
