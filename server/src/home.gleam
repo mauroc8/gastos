@@ -1,12 +1,12 @@
-import client_components/redirect
+import client_components
+import css
 import dashboard
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/int
 import gleam/option.{type Option, None, Some}
 import helpers/html_extra
-import lib/css
-import lib/layout
+import layout
 import lustre
 import lustre/attribute
 import lustre/effect
@@ -161,7 +161,7 @@ fn view(state: State) {
 
   // Performs a client-side redirect through a custom element
   let redirect_element = case redirect_to {
-    Some(href) -> redirect.to(href)
+    Some(href) -> client_components.redirect(href)
     None -> html.text("")
   }
 

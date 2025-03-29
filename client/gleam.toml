@@ -15,6 +15,7 @@ dev-dependencies = { lustre_dev_tools = ">= 1.6.5 and < 2.0.0" }
 # https://gleam.run/writing-gleam/gleam-toml/.
 
 [dependencies]
+common = { path = "../common" }
 gleam_http = ">= 3.0.0 and < 4.0.0"
 gleam_json = ">= 2.0.0 and < 3.0.0"
 gleam_stdlib = "0.55.0"

@@ -1,5 +1,4 @@
-import client_components/document_title
-import client_components/redirect
+import client_components
 import gleam/dict
 import gleam/dynamic
 import gleam/dynamic/decode
@@ -7,8 +6,8 @@ import gleam/io
 import gleam/option.{type Option, None, Some}
 import gleam/string
 import helpers/html_extra
+import layout
 import lib/id.{type DashboardT, type Id}
-import lib/layout
 import lustre
 import lustre/attribute
 import lustre/effect
@@ -218,13 +217,13 @@ fn view(state) {
 
   // Redirects client-side through a custom element
   let redirect_component = case redirect_to {
-    Some(href) -> redirect.to(href)
+    Some(href) -> client_components.redirect(href)
     None -> html.text("")
   }
 
   // Changes document title through a custom element
   let title_component =
-    document_title.value(case dashboard {
+    client_components.document_title(case dashboard {
       None -> "Cargando… | Gastos"
       Some(Ok(dashboard_data)) -> dashboard_data.title <> " | Gastos"
       Some(Error(_)) -> "Error | Gastos"
@@ -242,11 +241,14 @@ fn view(state) {
       redirect_component,
       case dashboard {
         None -> html.text("Cargando…")
-        Some(Ok(dashboard)) ->
+        Some(Ok(Dashboard(first_person_name:, second_person_name:, title:, id:))) ->
           html.div([], [
-            html.text(dashboard.title),
-            create_movement_form(dashboard),
-            view_movements(connection, dashboard.id),
+            html.text(title),
+            client_components.create_movement_form(
+              first_person_name: first_person_name,
+              second_person_name: second_person_name,
+            ),
+            view_movements(connection, id),
           ])
         Some(Error(DashboardNotFound)) ->
           html.text("El tablero solicitado no existe")
@@ -254,65 +256,6 @@ fn view(state) {
       },
     ],
   )
-}
-
-// --- create_movement_form
-
-fn create_movement_form(dashboard: Dashboard) {
-  let Dashboard(first_person_name:, second_person_name:, ..) = dashboard
-
-  html.fieldset([layout.column(), layout.fill_width(), layout.spacing(16)], [
-    html.legend([], [html.text("Crear movimiento")]),
-    html.div([layout.row(), layout.center_y(), layout.spacing(12)], [
-      html.label([layout.column(), layout.spacing(8)], [
-        html.div([html_extra.visually_hidden()], [html.text("Persona")]),
-        html.select([], [
-          html.option([attribute.value("0")], first_person_name),
-          html.option([attribute.value("1")], second_person_name),
-        ]),
-      ]),
-      html.label([layout.column(), layout.spacing(8)], [
-        html.div([html_extra.visually_hidden()], [
-          html.text("Tipo de movimiento"),
-        ]),
-        html.select([], [
-          html.option([attribute.value("0")], "gastó"),
-          html.option([attribute.value("1")], "tomó prestado"),
-        ]),
-      ]),
-      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
-        html.div([html_extra.visually_hidden()], [html.text("Monto")]),
-        html.div([], [html.text("$")]),
-        html.input([
-          attribute.type_("number"),
-          attribute.min("0"),
-          attribute.required(True),
-        ]),
-      ]),
-    ]),
-    html.label([layout.row(), layout.spacing(8), layout.center_y()], [
-      html.div([], [html.text("En concepto de")]),
-      html.input([]),
-    ]),
-    html.div([layout.row(), layout.center_y(), layout.spacing(12)], [
-      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
-        html.div([], [html.text("El día")]),
-        html.input([attribute.placeholder("de hoy")]),
-      ]),
-      html.label([layout.row(), layout.spacing(8), layout.center_y()], [
-        html.div([], [html.text("pagado en")]),
-        html.input([
-          attribute.type_("number"),
-          attribute.min("1"),
-          attribute.placeholder("1"),
-        ]),
-        html.span([], [html.text("cuota(s)")]),
-      ]),
-    ]),
-    html.div([layout.fill_width(), layout.row(), layout.align_right()], [
-      html.button([], [html.text("Crear")]),
-    ]),
-  ])
 }
 
 // --- view_movements

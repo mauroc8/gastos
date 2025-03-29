@@ -1,0 +1,7 @@
+name = "common"
+version = "1.0.0"
+
+[dependencies]
+gleam_json = ">= 2.0.0 and < 3.0.0"
+gleam_stdlib = "0.55.0"
+lustre = ">= 4.0.0 and < 5.0.0"

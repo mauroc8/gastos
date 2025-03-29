@@ -3,7 +3,7 @@ import gleam/dynamic/decode
 import gleam/int
 import gleam/list
 import gleam/result
-import lib/layout
+import layout
 import lustre/attribute
 import lustre/element/html
 
@@ -74,8 +74,4 @@ pub fn server_side_disabled(value) {
     True -> attribute.attribute("disabled", "true")
     False -> attribute.none()
   }
-}
-
-pub fn visually_hidden() {
-  attribute.class("visually-hidden")
 }

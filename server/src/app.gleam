@@ -38,12 +38,13 @@ pub fn main() {
           // let assert Ok(priv) = erlang.priv_directory("lustre")
           // let path = priv <> "src/lustre/lustre-server-component.mjs"
 
-          let path = "src/lustre/lustre-server-component.mjs"
+          let path = "../common/src/lustre/lustre-server-component.mjs"
 
           server.serve_static_file(path, "application/javascript")
         }
 
-        ["styles.css"] -> server.serve_static_file("src/styles.css", "text/css")
+        ["styles.css"] ->
+          server.serve_static_file("../common/src/styles.css", "text/css")
 
         // Serves the client/ build, which includes client components declarations
         ["index.mjs"] ->

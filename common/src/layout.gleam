@@ -1,4 +1,4 @@
-import lib/css
+import css
 import lustre/attribute
 import lustre/element/html
 

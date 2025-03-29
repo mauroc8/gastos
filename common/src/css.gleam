@@ -31,3 +31,9 @@ pub fn line_height(px) {
 pub fn semibold() {
   attribute.style([#("font-weight", "600")])
 }
+
+// --- helpers (see styles.css)
+
+pub fn visually_hidden() {
+  attribute.class("visually-hidden")
+}
