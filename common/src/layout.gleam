@@ -36,6 +36,8 @@ pub fn static_styles() {
 .column.center-y { justify-content: center; }
 .row.center-y { align-items: center; }
 
+.baseline { align-items: baseline; }
+
 .row > .fill-width { flex-grow: 1; }
 :not(.row) > .fill-width { width: 100% }
 
@@ -87,6 +89,10 @@ pub fn center_x() {
 /// Centers children vertically (in the y axis)
 pub fn center_y() {
   attribute.class("center-y")
+}
+
+pub fn baseline() {
+  attribute.class("baseline")
 }
 
 pub fn space_between() {

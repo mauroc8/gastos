@@ -3,6 +3,10 @@ import dashboard
 import gleam/erlang/process
 import gleam/http/request.{type Request, Request}
 import gleam/http/response.{type Response}
+import gleam/io
+import gleam/result
+import gleam/string
+import glexec as exec
 import helpers/server
 import home
 import migrations
@@ -47,11 +51,37 @@ pub fn main() {
           server.serve_static_file("../common/src/styles.css", "text/css")
 
         // Serves the client/ build, which includes client components declarations
-        ["index.mjs"] ->
+        ["script.mjs"] -> {
+          let assert Ok(bash) = exec.find_executable("bash")
+
+          case
+            exec.new()
+            |> exec.with_stdin(exec.StdinPipe)
+            |> exec.with_stdout(exec.StdoutCapture)
+            |> exec.with_stderr(exec.StderrStdout)
+            |> exec.with_monitor(True)
+            |> exec.with_pty(True)
+            |> exec.run_sync(
+              exec.Execve([
+                bash,
+                "-c",
+                "cd ../client && gleam run -m lustre/dev build app",
+              ]),
+            )
+          {
+            Ok(exec.Output([exec.Stdout(stdout)])) -> {
+              io.println("")
+              io.println("🐥 cd ../client && gleam run -m lustre/dev build app")
+              io.println(string.join(stdout, "\n"))
+            }
+            _ -> io.println_error("🐣 Couldn't build script.mjs")
+          }
+
           server.serve_static_file(
             "../client/priv/static/app.mjs",
             "application/javascript",
           )
+        }
 
         [] -> server.serve_html(home.page())
 

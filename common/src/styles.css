@@ -12,9 +12,12 @@ html, body {
   box-sizing: border-box;
 }
 
-/* 2. Remove default margin */
+/* 2. Remove some defaults */
 * {
   margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
 }
 
 body {
@@ -46,6 +49,12 @@ p {
 }
 h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
+}
+
+/* 9. hide unwanted adornments */
+
+input[type=number] {
+  appearance: textfield;
 }
 
 /* --- helpers */

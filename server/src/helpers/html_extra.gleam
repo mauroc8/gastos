@@ -17,10 +17,16 @@ pub fn document(title, body) {
     )
 
   let script =
-    html.script([attribute.type_("module"), attribute.src("/index.mjs")], "")
+    html.script([attribute.type_("module"), attribute.src("/script.mjs")], "")
 
   let static_stylesheet =
     html.link([attribute.rel("stylesheet"), attribute.href("/styles.css")])
+
+  let meta_viewport =
+    html.meta([
+      attribute.name("viewport"),
+      attribute.content("width=device-width, initial-scale=1"),
+    ])
 
   let title = html.title([], title)
 
@@ -28,6 +34,7 @@ pub fn document(title, body) {
     html.head([], [
       meta_charset,
       title,
+      meta_viewport,
       lustre_ui_runtime,
       static_stylesheet,
       layout.static_styles(),

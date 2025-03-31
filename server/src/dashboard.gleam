@@ -242,8 +242,8 @@ fn view(state) {
       case dashboard {
         None -> html.text("Cargando…")
         Some(Ok(Dashboard(first_person_name:, second_person_name:, title:, id:))) ->
-          html.div([], [
-            html.text(title),
+          html.div([layout.column(), layout.spacing(40)], [
+            html.h1([], [html.text(title)]),
             client_components.create_movement_form(
               first_person_name: first_person_name,
               second_person_name: second_person_name,
