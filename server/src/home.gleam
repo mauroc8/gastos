@@ -1,7 +1,6 @@
 import client_components
 import css
 import dashboard
-import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/int
 import gleam/option.{type Option, None, Some}
@@ -15,6 +14,8 @@ import lustre/element/html.{html}
 import lustre/event
 import lustre/server_component
 import shork
+import ui_kit
+import utils
 import youid/uuid
 
 pub fn page() {
@@ -133,12 +134,12 @@ fn view(state: State) {
   let State(form_error:, is_submitting:, redirect_to:, ..) = state
 
   let input = fn(max, blur_msg) {
-    html.input([
+    ui_kit.input([
       layout.fill_width(),
       attribute.autocomplete("one-time-code"),
       attribute.max(int.to_string(max)),
       server_component.include(["target.value"]),
-      attribute.on("blur", blur_handler(blur_msg)),
+      attribute.on("blur", utils.target_value_decoder(decode.string, blur_msg)),
     ])
   }
 
@@ -188,7 +189,7 @@ fn view(state: State) {
           second_person_name_input,
         ),
         error_message,
-        html.button(
+        ui_kit.action_button(
           [
             event.on_click(SubmittedForm),
             html_extra.server_side_disabled(is_submitting),
@@ -199,17 +200,4 @@ fn view(state: State) {
     ),
     redirect_element,
   ])
-}
-
-fn blur_handler(
-  msg,
-) -> fn(dynamic.Dynamic) -> Result(Msg, List(dynamic.DecodeError)) {
-  fn(event) {
-    let decoder =
-      decode.at(["target", "value"], decode.string)
-      |> decode.map(msg)
-
-    decode.run(event, decoder)
-    |> html_extra.lustre_decoder_result
-  }
 }

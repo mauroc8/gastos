@@ -47,8 +47,11 @@ pub fn main() {
           server.serve_static_file(path, "application/javascript")
         }
 
-        ["styles.css"] ->
-          server.serve_static_file("../common/src/styles.css", "text/css")
+        ["reset.css"] ->
+          server.serve_static_file("../common/src/reset.css", "text/css")
+
+        ["ui-kit.css"] ->
+          server.serve_static_file("../common/src/ui-kit.css", "text/css")
 
         // Serves the client/ build, which includes client components declarations
         ["script.mjs"] -> {

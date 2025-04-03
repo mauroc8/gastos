@@ -6,7 +6,7 @@ pub fn px_to_string(value) {
   int.to_string(value) <> "px"
 }
 
-pub fn px_to_rem_string(px) {
+pub fn px_as_rem(px) {
   float.to_string(int.to_float(px) /. 16.0) <> "rem"
 }
 
@@ -21,19 +21,13 @@ pub fn padding_xy(x_px, y_px) {
 }
 
 pub fn font_size(px) {
-  attribute.style([#("font-size", px_to_rem_string(px))])
+  attribute.style([#("font-size", px_as_rem(px))])
 }
 
 pub fn line_height(px) {
-  attribute.style([#("line-height", px_to_rem_string(px))])
+  attribute.style([#("line-height", px_as_rem(px))])
 }
 
 pub fn semibold() {
   attribute.style([#("font-weight", "600")])
-}
-
-// --- helpers (see styles.css)
-
-pub fn visually_hidden() {
-  attribute.class("visually-hidden")
 }

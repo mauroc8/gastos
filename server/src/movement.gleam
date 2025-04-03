@@ -7,6 +7,8 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/order
 import lib/id.{type DashboardT, type Id}
+import movement_kind
+import person
 import shork
 
 pub fn migrations() {
@@ -36,8 +38,8 @@ create table if not exists gastos.movement (
 pub type Movement {
   Movement(
     id: Id(Movement),
-    person: Person,
-    kind: Kind,
+    person: person.Person,
+    kind: movement_kind.Kind,
     amount: Int,
     concept: String,
     date: birl.Time,
@@ -49,8 +51,8 @@ pub type Movement {
 pub fn create(
   connection,
   dashboard_id: Id(DashboardT),
-  person: Person,
-  kind: Kind,
+  person: person.Person,
+  kind: movement_kind.Kind,
   amount: Int,
   concept: String,
   date: birl.Time,
@@ -71,8 +73,8 @@ pub fn create(
   ",
   )
   |> shork.parameter(id.parameter(dashboard_id))
-  |> shork.parameter(shork.text(person_to_string(person)))
-  |> shork.parameter(shork.text(kind_to_string(kind)))
+  |> shork.parameter(shork.text(person.to_string(person)))
+  |> shork.parameter(shork.text(movement_kind.to_string(kind)))
   |> shork.parameter(shork.text(int.to_string(amount)))
   |> shork.parameter(shork.text(concept))
   |> shork.parameter(shork.text(birl.to_iso8601(date)))
@@ -99,8 +101,8 @@ pub fn fetch(with connection, in dashboard_id: Id(DashboardT)) {
   |> shork.parameter(id.parameter(dashboard_id))
   |> shork.returning({
     use id <- decode.field(0, id.decode())
-    use person <- decode.field(1, decode_person())
-    use kind <- decode.field(2, decode_kind())
+    use person <- decode.field(1, person.decode())
+    use kind <- decode.field(2, movement_kind.decode())
     use amount <- decode.field(3, decode.int)
     use concept <- decode.field(4, decode.string)
     use date <- decode.field(5, decode_time())
@@ -139,8 +141,8 @@ pub fn balance(movements: List(Movement), now: birl.Time) -> Int {
 
   let movement_balance =
     int.to_float(amount)
-    *. person_multiplier(person)
-    *. kind_multiplier(kind)
+    *. person.multiplier(person)
+    *. movement_kind.multiplier(kind)
     *. installments_multiplier(#(date, installments), now)
     |> float.round()
 
@@ -149,78 +151,16 @@ pub fn balance(movements: List(Movement), now: birl.Time) -> Int {
 
 /// Returns how much one person owes to another based on the movements, or None if the debt is
 /// settled.
-pub fn debt(movements: List(Movement), now: birl.Time) -> Option(#(Person, Int)) {
+pub fn debt(
+  movements: List(Movement),
+  now: birl.Time,
+) -> Option(#(person.Person, Int)) {
   case balance(movements, now) {
-    balance if balance < 0 -> Some(#(SecondPerson, -balance))
+    balance if balance < 0 -> Some(#(person.Second, -balance))
 
     balance if balance == 0 -> None
 
-    balance -> Some(#(FirstPerson, balance))
-  }
-}
-
-// ## PERSON
-
-pub type Person {
-  FirstPerson
-  SecondPerson
-}
-
-fn person_to_string(person: Person) -> String {
-  case person {
-    FirstPerson -> "0"
-    SecondPerson -> "1"
-  }
-}
-
-fn decode_person() {
-  use string <- decode.then(decode.string)
-
-  case string {
-    "0" -> decode.success(FirstPerson)
-    "1" -> decode.success(SecondPerson)
-    _ -> decode.failure(FirstPerson, "decode_person expects a '0' or '1'")
-  }
-}
-
-fn person_multiplier(person: Person) {
-  case person {
-    FirstPerson -> -1.0
-    SecondPerson -> 1.0
-  }
-}
-
-// ## KIND
-
-pub type Kind {
-  /// A shared expense divided equally between the two persons
-  Expense
-  /// A loan that one person has to pay to the other
-  GrantedLoan
-}
-
-fn kind_to_string(kind: Kind) -> String {
-  case kind {
-    Expense -> "0"
-    GrantedLoan -> "1"
-  }
-}
-
-fn decode_kind() {
-  use string <- decode.then(decode.string)
-
-  case string {
-    "0" -> decode.success(Expense)
-    "1" -> decode.success(GrantedLoan)
-    _ -> decode.failure(Expense, "decode_kind expects a '0' or '1'")
-  }
-}
-
-fn kind_multiplier(kind: Kind) {
-  case kind {
-    // Expenses are shared 50% between the two persons, so the other person only owes half of its amount
-    Expense -> 0.5
-    GrantedLoan -> 1.0
+    balance -> Some(#(person.First, balance))
   }
 }
 

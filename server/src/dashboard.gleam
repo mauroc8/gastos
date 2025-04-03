@@ -260,17 +260,6 @@ fn view(state) {
 
 // --- view_movements
 
-pub type CreateForm {
-  CreateForm(
-    person: movement.Person,
-    kind: movement.Kind,
-    amount: Option(Int),
-    concept: String,
-    date: String,
-    installments: String,
-  )
-}
-
 fn view_movements(connection: shork.Connection, dashboard_id: Id(DashboardT)) {
   let movements = movement.fetch(connection, dashboard_id)
 

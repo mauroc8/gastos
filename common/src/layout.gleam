@@ -110,7 +110,7 @@ pub fn spacing(px) {
 /// with font-size, for example spacing between paragraphs.
 /// 
 pub fn text_spacing(px) {
-  attribute.style([#("gap", css.px_to_rem_string(px))])
+  attribute.style([#("gap", css.px_as_rem(px))])
 }
 
 pub fn wrap() {

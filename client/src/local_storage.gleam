@@ -1,8 +1,9 @@
+import gleam/option
 import lustre/attribute
 import lustre/event
 
-pub fn save_input_value(key: String, nil: msg) {
-  let value = local_storage_get_string(key)
+pub fn save_input_value(key: String, nil: msg, value: option.Option(String)) {
+  let value = value |> option.unwrap(local_storage_get_string(key))
 
   let change_handler = fn(value) {
     local_storage_set_string(key, value)
